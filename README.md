@@ -5,7 +5,7 @@ Casalegno S., Anderson K., Cox D.T.C., Hancock S. & Gaston K.J. Ecological conne
 
 Prior to the below scripting routines it is required to process raw waveform LiDAR data using "voxelate.c" program available at https://bitbucket.org/StevenHancock/voxelate. The resulting layers generated fom "voxelate.c" are a series of GeoTIFF files reprsenting voxel (volumetric pixels) of 1.5m x 1.5m (X-Y) x 0.5m (Z) dimesions.
 
-connectivity_0.sh It is a bash GRASS script to create an NDVI mask, read voxels layers from "voxelate.c" and generate 2D layers of vertically straified vegetation divided in grass (0-50cm); shrubs (51cm-3.5m) ; trees (3.51m - 30m). 
+connectivity_0.sh It is a linux bash GRASS script creating an NDVI mask, read voxels layers from "voxelate.c" and generate 2D layers of vertically straified vegetation divided in grass (0-50cm); shrubs (51cm-3.5m) ; trees (3.51m - 30m). 
 
 connectivity_1.sh create raster maps with increasing buffer width for the overall vegetation, shrub, tree and grass layers in tree towns (Bedford, Luton, Milton Keynes). Then it computes the density of gardens for each layer and towns.
 
