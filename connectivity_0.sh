@@ -1,11 +1,12 @@
 #!/bin/sh
 #$ -S /bin/bash
 
-# This script is for running ion Bewolf cluster computer. run it using:
-# for CITY in LT BD MK ; do FILTER=dis3mh ; THRESHOLD=0.01 ; echo  qsub -e /home/ISAD/sc517/MYbess/stderr -o /home/ISAD/sc517/MYbess/stdout MYbess/bess_script/discVsFullwave_Trees_3m.sh $CITY $FILTER $THRESHOLD ; done
-# or to test it in one node using qlogin and paste single commands
-# grass -text /path/to/GRASSDB/LOCATION/PERMANENT/
+# run it using:
 
+# for CITY in LT BD MK ; do FILTER=disII ; THRESHOLD=0.01 ; echo  qsub -e /home/ISAD/sc517/MYbess/stderr -o /home/ISAD/sc517/MYbess/stdout MYbess/bess_script/discVsFullwave.sh $CITY $FILTER $THRESHOLD ; done
+
+# or test it in one node using qlogin and paste single commands
+# grass -text /home/ISAD/sc517/MYbess/grassdb/epsg27700/PERMANENT/
 
 ###########################  add modules
 . /etc/profile.d/modules.sh
@@ -29,7 +30,7 @@ export PYTHONPATH=/cm/shared/apps/GRASS/7.0/grass-7.0.svn/etc/python
 export GISRC=~/.grassrc7_$$
 export GIS_LOCK=$$
 
-INMp=/local/sc517                   # geoTIFF fles generated from vxelate.c are copied locally and vrt are read locally in each node
+INMp=/local/sc517                   # tif fles are copied locally and vrt are read locally
 OUTd=/home/ISAD/sc517/MYbess/tables/$FILTER.$CITY
 newmapsest=/home/ISAD/sc517/MYbess/grassdb/epsg27700/$FILTER.$CITY
 
@@ -59,7 +60,9 @@ file=$INMp/a$CITY$HEIGHT.vrt
 r.in.gdal -o input=$file output=template.$HEIGHT$CITY    --overwrite
 
 
-## CREATE A MASK WITHIN VEGETATED areas using NDVI
+
+
+## CREATE A MASK of VEGETATED area using NDVI
 r.external -o input=/home/groups/bess/maps/roughClass.$CITY.tif    output=$CITY.classmap     --overwrite  # 2m res layer
 r.mapcalc "$CITY.ndvi = if($CITY.classmap<21,1,0)"  --overwrite
 r.mapcalc "ward.veg.mask.$CITY = if($CITY.ndvi==1,1,null())"   ### MASK of vegetated areas in WARD 
@@ -91,17 +94,40 @@ done
 
 ##############################################################
 # DENSITY OF VEGETATION PER STRATA 
-# Accumulated voxel density for different stara of vegetation : 0-Grass; 1-Shrubs; 2-trees; 3-All vegetation 2D
-# trees or veg taller than 3.5m 
+# Accumulated voxel density for different stara of vegetation : 0-Grass; 1-Shrubs; 2-Short trees; 3-Tall trees; 4-All trees; 5-All woody vegetation; 6-All vegetation
+#
+# 0: grass
+r.mapcalc "$CITY.Accu.VOX.DEN.0 =  VOX.DEN.0" --overwrite
+# 1: shrub
+r.mapcalc "$CITY.Accu.VOX.DEN.1 =  VOX.DEN.1 + VOX.DEN.2 + VOX.DEN.3 + VOX.DEN.4 + VOX.DEN.5 + VOX.DEN.6 + VOX.DEN.7 " --overwrite 
+# 2: short trees
+r.mapcalc "$CITY.Accu.VOX.DEN.2 = VOX.DEN.8 + VOX.DEN.9 + VOX.DEN.10 + VOX.DEN.11 + VOX.DEN.12 + VOX.DEN.13 + VOX.DEN.14 + VOX.DEN.15 + VOX.DEN.16 + VOX.DEN.17 + VOX.DEN.18 + VOX.DEN.19 + VOX.DEN.20 + VOX.DEN.21 + VOX.DEN.22 + VOX.DEN.23 + VOX.DEN.24 + VOX.DEN.25 + VOX.DEN.26 + VOX.DEN.27 + VOX.DEN.28 + VOX.DEN.29" --overwrite 
+# 3: tall trees
+r.mapcalc "$CITY.Accu.VOX.DEN.3 = VOX.DEN.30 + VOX.DEN.31 + VOX.DEN.32 + VOX.DEN.33 + VOX.DEN.34 + VOX.DEN.35 + VOX.DEN.36 + VOX.DEN.37 + VOX.DEN.38 + VOX.DEN.39 + VOX.DEN.40 + VOX.DEN.41 + VOX.DEN.42 + VOX.DEN.43 + VOX.DEN.44 + VOX.DEN.45 + VOX.DEN.46 + VOX.DEN.47+ VOX.DEN.48 + VOX.DEN.49 + VOX.DEN.50 + VOX.DEN.51 + VOX.DEN.52 + VOX.DEN.53 + VOX.DEN.54 + VOX.DEN.55 + VOX.DEN.56 + VOX.DEN.57 + VOX.DEN.58 + VOX.DEN.59 + VOX.DEN.60 " --overwrite 
+# 4: trees
+r.mapcalc "$CITY.Accu.VOX.DEN.4 = $CITY.Accu.VOX.DEN.3 + $CITY.Accu.VOX.DEN.2" --overwrite 
+# 5: woody veg
+r.mapcalc "$CITY.Accu.VOX.DEN.5 = $CITY.Accu.VOX.DEN.3 + $CITY.Accu.VOX.DEN.2 + $CITY.Accu.VOX.DEN.1" --overwrite 
+# 6: all vegetation
+r.mapcalc "$CITY.Accu.VOX.DEN.6 = $CITY.Accu.VOX.DEN.0 + $CITY.Accu.VOX.DEN.5" --overwrite 
 
-r.mapcalc "$CITY.Accu.VOX.DEN.3mh = VOX.DEN.6 + VOX.DEN.7 + VOX.DEN.8 + VOX.DEN.9 + VOX.DEN.10 + VOX.DEN.11 + VOX.DEN.12 + VOX.DEN.13 + VOX.DEN.14 + VOX.DEN.15 + VOX.DEN.16 + VOX.DEN.17 + VOX.DEN.18 + VOX.DEN.19 + VOX.DEN.20 + VOX.DEN.21 + VOX.DEN.22 + VOX.DEN.23 + VOX.DEN.24 + VOX.DEN.25 + VOX.DEN.26 + VOX.DEN.27 + VOX.DEN.28 + VOX.DEN.29 + VOX.DEN.30 + VOX.DEN.31 + VOX.DEN.32 + VOX.DEN.33 + VOX.DEN.34 + VOX.DEN.35 + VOX.DEN.36 + VOX.DEN.37 + VOX.DEN.38 + VOX.DEN.39 + VOX.DEN.40 + VOX.DEN.41 + VOX.DEN.42 + VOX.DEN.43 + VOX.DEN.44 + VOX.DEN.45 + VOX.DEN.46 + VOX.DEN.47+ VOX.DEN.48 + VOX.DEN.49 + VOX.DEN.50 + VOX.DEN.51 + VOX.DEN.52 + VOX.DEN.53 + VOX.DEN.54 + VOX.DEN.55 + VOX.DEN.56 + VOX.DEN.57 + VOX.DEN.58 + VOX.DEN.59 + VOX.DEN.60 " --overwrite 
 
 ##############################################################
 # PRESENCE / ABSENCE OF VEGETATION PER STRATA -- MINDCRAFT world ---
 ## Accumulated voxel (binary) for different strata to calculate cubic meter per ha. 
 # 0-Grass; 1-Shrubs; 2-Short trees; 3-Tall trees; 4-All trees; 5-All woody vegetation; 6-All vegetation
+# grass
+r.mapcalc "$CITY.Accu.VOX.BIN.0 =  VOX.BIN.0" --overwrite
+# shrub
+r.mapcalc "$CITY.Accu.VOX.BIN.1 =  VOX.BIN.1 + VOX.BIN.2 + VOX.BIN.3 + VOX.BIN.4 + VOX.BIN.5 + VOX.BIN.6 + VOX.BIN.7 " --overwrite
+# short trees
+r.mapcalc "$CITY.Accu.VOX.BIN.2 = VOX.BIN.8 + VOX.BIN.9 + VOX.BIN.10 + VOX.BIN.11 + VOX.BIN.12 + VOX.BIN.13 + VOX.BIN.14 + VOX.BIN.15 + VOX.BIN.16 + VOX.BIN.17 + VOX.BIN.18 + VOX.BIN.19 + VOX.BIN.20 + VOX.BIN.21 + VOX.BIN.22 + VOX.BIN.23 + VOX.BIN.24 + VOX.BIN.25 + VOX.BIN.26 + VOX.BIN.27 + VOX.BIN.28 + VOX.BIN.29" --overwrite 
 
-# trees taller than 3m
-r.mapcalc "$CITY.Accu.VOX.BIN.3mh = VOX.BIN.6 +VOX.BIN.7 +VOX.BIN.8 + VOX.BIN.9 + VOX.BIN.10 + VOX.BIN.11 + VOX.BIN.12 + VOX.BIN.13 + VOX.BIN.14 + VOX.BIN.15 + VOX.BIN.16 + VOX.BIN.17 + VOX.BIN.18 + VOX.BIN.19 + VOX.BIN.20 + VOX.BIN.21 + VOX.BIN.22 + VOX.BIN.23 + VOX.BIN.24 + VOX.BIN.25 + VOX.BIN.26 + VOX.BIN.27 + VOX.BIN.28 + VOX.BIN.29 + VOX.BIN.30 + VOX.BIN.31 + VOX.BIN.32 + VOX.BIN.33 + VOX.BIN.34 + VOX.BIN.35 + VOX.BIN.36 + VOX.BIN.37 + VOX.BIN.38 + VOX.BIN.39 + VOX.BIN.40 + VOX.BIN.41 + VOX.BIN.42 + VOX.BIN.43 + VOX.BIN.44 + VOX.BIN.45 + VOX.BIN.46 + VOX.BIN.47+ VOX.BIN.48 + VOX.BIN.49 + VOX.BIN.50 + VOX.BIN.51 + VOX.BIN.52 + VOX.BIN.53 + VOX.BIN.54 + VOX.BIN.55 + VOX.BIN.56 + VOX.BIN.57 + VOX.BIN.58 + VOX.BIN.59 + VOX.BIN.60 " --overwrite 
+r.mapcalc "$CITY.Accu.VOX.BIN.3 = VOX.BIN.30 + VOX.BIN.31 + VOX.BIN.32 + VOX.BIN.33 + VOX.BIN.34 + VOX.BIN.35 + VOX.BIN.36 + VOX.BIN.37 + VOX.BIN.38 + VOX.BIN.39 + VOX.BIN.40 + VOX.BIN.41 + VOX.BIN.42 + VOX.BIN.43 + VOX.BIN.44 + VOX.BIN.45 + VOX.BIN.46 + VOX.BIN.47+ VOX.BIN.48 + VOX.BIN.49 + VOX.BIN.50 + VOX.BIN.51 + VOX.BIN.52 + VOX.BIN.53 + VOX.BIN.54 + VOX.BIN.55 + VOX.BIN.56 + VOX.BIN.57 + VOX.BIN.58 + VOX.BIN.59 + VOX.BIN.60 " --overwrite 
+# trees
+r.mapcalc "$CITY.Accu.VOX.BIN.4 = $CITY.Accu.VOX.BIN.3 + $CITY.Accu.VOX.BIN.2" --overwrite 
+# woody veg
+r.mapcalc "$CITY.Accu.VOX.BIN.5 = $CITY.Accu.VOX.BIN.3 + $CITY.Accu.VOX.BIN.2 + $CITY.Accu.VOX.BIN.1" --overwrite 
+# all vegetation
+r.mapcalc "$CITY.Accu.VOX.BIN.6 = $CITY.Accu.VOX.BIN.0 + $CITY.Accu.VOX.BIN.5" --overwrite 
 
-###### FINISH
