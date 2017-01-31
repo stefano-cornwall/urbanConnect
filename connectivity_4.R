@@ -15,14 +15,15 @@ s.MK=as.vector(read.table("/media/ste/backup/bess/connectivity/locosProces/funct
 t.MK=as.vector(read.table("/media/ste/backup/bess/connectivity/locosProces/functional/MK.17.trees.values.txt"))
 
 
-## COMPARE 2D vs 3D
+## Figure 3. 
+#COMPARE 2D vs 3D
 # Zoom to 40m only
 AXat= c(1,2,3,4,5,6,8,10,15,20)
 AXwrt=c(0,4,6,8,10,12,16,20,30,40)
 AYat=c(0,0.25,0.5,0.75,1.0)
 AYwrt=c(0,0.25,0.5,0.75,1)
 # Plot legend
-png("/media/ste/backup/bess/connectivity/output_figures/compare_2Dvs3D_legend.png", width = 800, height = 60)
+tiff("/media/ste/backup/bess/connectivity/output_figures/figure3_legend.tiff", width = 800, height = 60)
 par(mar=c(0,0,0,0))
 plot(c(1:2),c(1:2), type="n", axes=F, xlab="", ylab="")
 legend(1,2,c("2D greencover ","Grass layer","Shrub layer","Tree layer"), horiz = TRUE, pch=c(15,15,15,15), pt.cex=c(4,4,4,4),  cex=2,   col = c("antiquewhite4","orange","blue","darkgreen"), bty = "n" )
@@ -30,7 +31,7 @@ dev.off()
 
 #Plot data
 AX=1.9
-png("/media/ste/backup/bess/connectivity/output_figures/compare_2Dvs3D.png", width = 800, height = 1200)
+tiff("/media/ste/backup/bess/connectivity/output_figures/figure_3.tiff", width = 800, height = 1200)
 nf <- layout(matrix(c(1,4,2,5,3,6),3,2,byrow=TRUE), c(1,1), c(1,1), TRUE) ; layout.show(nf) ; par(mar=c(4,6,4,1))
 plot(c(1:20),a.MK[1:20,], type="b",  ylim=c(0,1), xaxt="n", yaxt="n", main="Milton Keynes", xlab="", ylab="Connectivity Index", col="antiquewhite4", lwd=3, cex=1.5 , cex.lab=2.9, cex.main=2.9, cex.axis=1.4)
 axis(1, at=AXat,labels=AXwrt, cex.axis=AX)
@@ -81,8 +82,8 @@ points(c(1:20),t.LT[1:20,]-a.LT[1:20,],type="b", col="darkgreen", lwd=3, cex=1.5
 text(18,0.9,labels="f",cex=4)
 dev.off()
 
-
-## Plot garden density per strata (optional - not required in the paper)
+##Figure 2
+## Plot garden density per strata 
 library(ggplot2)
 MY.df=data.frame(Layer=rep(c("2D","Grass","Shrub","Tree"),3))
 MY.df$Town=c("Milton Keynes","Milton Keynes","Milton Keynes","Milton Keynes","Bedford","Bedford","Bedford","Bedford","Luton","Luton","Luton","Luton")
@@ -97,24 +98,36 @@ ATiY=35
 ATX=38
 ATY=25
 
-png("/media/ste/backup/bess/connectivity/output_figures/GP_landscape.png", width = 800, height = 800)
+tiff("/media/ste/backup/bess/connectivity/output_figures/GreenCover.tiff", width = 800, height = 800)
 ggplot(MY.df, aes(Town, Landscape ,fill=Layer ) ) + geom_bar(stat="identity", position = "dodge") + scale_fill_manual(values=c("antiquewhite4","orange","blue","darkgreen")) +  labs(  y = "Landscape proportion") + labs(  x = "") + ggtitle("Green cover (a)") + 
 theme(axis.title.x=element_blank(), axis.title.y=element_text(size=ATiY,face="bold"), axis.text.x=element_text(size=ATX),axis.text.y=element_text(size=ATY),legend.text=element_text(size=18),legend.title=element_text(size=18) , plot.title = element_text(size=40, lineheight=.9, face="bold") ) + guides(fill=FALSE)
 dev.off()
 
-png("/media/ste/backup/bess/connectivity/output_figures/GP_SmallPIx.png", width = 800, height = 800)
+tiff("/media/ste/backup/bess/connectivity/output_figures/Fragmentation.tiff", width = 800, height = 800)
 ggplot(MY.df, aes(Town, Garden ,fill=Layer ) ) + geom_bar(stat="identity", position = "dodge") + scale_fill_manual(values=c("antiquewhite4","orange","blue","darkgreen")) +  labs(  y = "Small patch index") + labs(  x = "") + ggtitle("Fragmentation (b)") +
 theme(axis.title.x=element_blank(), axis.title.y=element_text(size=ATiY,face="bold"), axis.text.x=element_text(size=ATX),axis.text.y=element_text(size=ATY),legend.text=element_text(size=18),legend.title=element_text(size=18) , plot.title = element_text(size=40, lineheight=.9, face="bold") )+ guides(fill=FALSE)
 dev.off()
 
-png("/media/ste/backup/bess/connectivity/output_figures/GP_LargePIx.png", width = 800, height = 800)
+tiff("/media/ste/backup/bess/connectivity/output_figures/CoreArea.tiff", width = 800, height = 800)
 ggplot(MY.df, aes(Town, LPI ,fill=Layer ) ) + geom_bar(stat="identity", position = "dodge") + scale_fill_manual(values=c("antiquewhite4","orange","blue","darkgreen")) +  labs(  y = "Largest patch index") + labs(  x = "") + ggtitle("Core area (c)") +
 theme(axis.title.x=element_blank(), axis.title.y=element_text(size=ATiY,face="bold"), axis.text.x=element_text(size=ATX),axis.text.y=element_text(size=ATY),legend.text=element_text(size=18),legend.title=element_text(size=18) , plot.title = element_text(size=40, lineheight=.9, face="bold") )+ guides(fill=FALSE)
 dev.off()
 
-
-png("/media/ste/backup/bess/connectivity/output_figures/GP_connect.png", width = 800, height = 800)
+tiff("/media/ste/backup/bess/connectivity/output_figures/Connectivity.tiff", width = 800, height = 800)
 ggplot(MY.df, aes(Town, connect ,fill=Layer ) ) + geom_bar(stat="identity", position = "dodge") + scale_fill_manual(values=c("antiquewhite4","orange","blue","darkgreen")) +  labs(  y = "Connectivity index") + labs(  x = "") + ggtitle("Connectivity (d)") + 
 theme(axis.title.x=element_blank(), axis.title.y=element_text(size=ATiY,face="bold"), axis.text.x=element_text(size=ATX),axis.text.y=element_text(size=ATY),legend.text=element_text(size=28),legend.title=element_text(size=18) , plot.title = element_text(size=40, lineheight=.9, face="bold") ) + guides(fill=FALSE)
+dev.off()
+
+
+tiff("/media/ste/backup/bess/connectivity/output_figures/figure_2_legend.tiff", width = 1600, height = 120)
+par(mar=c(0,0,0,0))
+plot(c(1:2),c(1:2), type="n", axes=F, xlab="", ylab="")
+legend(1,2,c("2D greencover ","Grass layer","Shrub layer","Tree layer"), horiz = TRUE, pch=c(15,15,15,15), pt.cex=c(8,8,8,8),  cex=3.8,   col = c("antiquewhite4","orange","blue","darkgreen"), bty = "n" )
+dev.off()
+
+tiff("/media/ste/backup/bess/connectivity/output_figures/figure_1_legend.tiff", width = 2400, height = 180)
+par(mar=c(0,0,0,0))
+plot(c(1:2),c(1:2), type="n", axes=F, xlab="", ylab="")
+legend(1,2,c("2D greencover ","Grass layer","Shrub layer","Tree layer"), horiz = TRUE, pch=c(15,15,15,15), pt.cex=c(10,10,10,10),  cex=5.5,   col = c("antiquewhite4","orange","blue","darkgreen"), bty = "n" )
 dev.off()
 
