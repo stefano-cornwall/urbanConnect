@@ -15,7 +15,9 @@ Prior to the below scripting routines it is required to process raw waveform LiD
 
 5. connectivity_4.R R script. Plot graphics : Landsace division vs buffer size (functional connectivity) and Towns vs Landscape proportion, Small Patch Index, Large Patch Index, Connectivity Index (structural connectivity).
 
+6. connectivity_5.sh Bash AWK Grass and Gnuplot script to generate 3D graphical point cloud plots of voxel data. 
+
 Software minimum requirements:
-GRASS 6.4; AWK; LecoS – Landscape Ecology Statistics plugin version 2.6 under Qgis software version 2.14; Python version 2.7.12; R software version 3.2.3.
+GRASS 6.4; AWK; LecoS – Landscape Ecology Statistics plugin version 2.6 under Qgis software version 2.14; Python version 2.7.12; R software version 3.2.3.; gnuplot
 
 N.B. The use of the OsGeo-live virtual machine https://live.osgeo.org/ has all software requirement pre-installed.
